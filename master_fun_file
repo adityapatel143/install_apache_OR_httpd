@@ -13,7 +13,8 @@
 root_or_not()
 {
 if [ $(id -u) != 0 ]; then
-        echo "you are not a root user !!!"
+        echo -e "\nyou are not a root user !!!"
+	echo -e "Usage : sudo $0 \n"
         exit
 fi
 }
@@ -80,7 +81,7 @@ disable_service()
                 echo -e " Disabiling the $SERVICE_NAME !!! ...\n"
                 systemctl disable $SERVICE_NAME.service # disable the firewall
                 if [ $? = 0 ]; then
-                        echo -e "******  $SERVICE_NAME service is  disabled successfully ...  ******\n"
+                        echo -e "******  $SERVICE_NAME service is  disabled successfully  ******\n"
                 else
                         echo -e "Error !!!! in disabling the $SERVICE_NAME \n"
                         echo -e "please see the logs for detail ...\n"
@@ -88,7 +89,7 @@ disable_service()
                         exit    #stop the further execution of script
                 fi
         else
-                echo -e "******  $SERVICE_NAME is in disabled state . . .  ******\n"
+                echo -e "******  $SERVICE_NAME is in disabled state  ******\n"
         fi
 }
 
@@ -144,7 +145,7 @@ change_to_permissive()
 
 start_service()
 {
-        SERVICE_STATUS=`systemctl status $SERVICE_NAME.service | grep "Active" | awk '{print $4}'`
+        SERVICE_STATUS=`systemctl status $SERVICE_NAME.service | grep "Active" | awk '{print $2}'`
         # check if service is enabled
         if [ "$SERVICE_STATUS" != "active" ]; then
                 echo -e "\n$SERVICE_NAME service is off . . .\n"
@@ -170,7 +171,7 @@ start_service()
 
 enable_service()
 {
-        SERVICE_STATUS=`systemctl status $SERVICE_NAME.service | grep "Loaded" | awk '{print $2}'`
+        SERVICE_STATUS=`systemctl status $SERVICE_NAME.service | grep "Loaded" | awk '{print $4}'`
         # check if service is started/ON
         if [ "$SERVICE_STATUS" != "enabled;" ]; then
                 echo -e "\n$SERVICE_NAME service is disabled . . .\n"
@@ -196,8 +197,8 @@ enable_service()
 find_port_no()
 {
         PORT_NO=`netstat -ntpl | grep $SHOW_PORT | awk '{print $4}'`
-        netstat -ntpl | grep httpd
-        if [ $? == 0 ]; then
+        netstat -ntpl | grep $SHOW_PORT
+        if [ $? -eq 0 ]; then
                 echo "$SHOW_PORT service is running on port : $PORT_NO"
         else
                 echo -e "!!! Error !!! $SHOW_PORT service not started on any of the port.\n"
